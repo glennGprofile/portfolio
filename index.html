@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIS Portfolio</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --primary: #1f2933;
+    --accent: #2c7a7b;
+    --light: #f4f7f9;
+    --glass: rgba(255,255,255,0.55);
+    --border: rgba(255,255,255,0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: 
+    linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)),
+    url('images/bg.webp') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--primary);
+    overflow-y: scroll;
+}
+
+
+/* ======================
+   RIGHT SIDEBAR (Improved)
+====================== */
+nav {
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    padding: 24px 30px;
+    min-width: 150px;
+
+    background: rgba(255,255,255,0.92);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+
+    box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+
+    backdrop-filter: blur(6px);
+
+    z-index: 1000;
+}
+
+nav ul {
+    list-style: none;
+}
+
+nav ul li {
+    margin: 12px 0;
+}
+
+nav ul li a {
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+
+    color: var(--primary);
+    opacity: 0.75;
+
+    padding: 6px 0;
+    display: block;
+
+    transition: all 0.25s ease;
+}
+
+nav ul li a:hover {
+    opacity: 1;
+    color: var(--accent);
+}
+
+nav ul li a.active {
+    color: var(--accent);
+    opacity: 1;
+    font-weight: 600;
+}
+
+/* ======================
+   SECTIONS
+====================== */
+section {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.dropdown-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+  margin-top: 10px;
+}
+
+.software-block.active .dropdown-content {
+  max-height: 2000px;
+}
+
+/* Each project row is a flex container: title left, image right */
+.project-row {
+  display: flex;
+  align-items: center;   /* vertical center alignment */
+  justify-content: space-between;  /* push title and image to edges */
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* Project title styling */
+.project-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+  white-space: normal;   /* allow wrapping */
+  line-height: 1.2;
+  flex-grow: 1;          /* take remaining space */
+  max-width: calc(100% - 80px); /* leave room for image */
+}
+
+.project-title:hover {
+  color: var(--accent);
+}
+
+/* Project image styling */
+.project-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border: 2px solid var(--primary);
+  border-radius: 6px;
+  user-select: none;
+  pointer-events: none;
+  flex-shrink: 0;  /* prevent shrinking */
+}
+
+
+
+
+.section-inner {
+    width: 100%;
+    max-width: 1100px;
+    padding: 100px 15%;
+    opacity: 0;
+    transform: translateY(60px);
+    transition: all 1s ease;
+}
+
+.section-inner.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.section-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    padding: 100px 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.section-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 35px;
+    letter-spacing: 0.5px;
+}
+
+/* Glass containers */
+.glass {
+    background: var(--glass);
+    background: rgba(255,255,255,0.85);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 50px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+}
+
+/* ======================
+   ABOUT
+====================== */
+.about-container {
+    display: flex;
+    gap: 60px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.about-text {
+    flex: 1 1 400px;
+}
+
+.about-text h1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.about-text p {
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.about-image img {
+    width: 100%;
+    max-width: 280px;
+    border-radius: 10px;
+}
+
+.icon-links {
+  display: flex;
+  gap: 20px;
+}
+
+.icon-links a {
+  display: inline-block;
+}
+
+.icon-img {
+  width: 40px;       /* fixed width */
+  height: 40px;      /* fixed height */
+  object-fit: contain;
+  transition: 0.3s;
+}
+
+.icon-links a:hover .icon-img {
+  transform: scale(1.1);   /* subtle hover effect */
+}
+
+/* ======================
+   PROJECTS DROPDOWNS
+====================== */
+.software-block {
+    margin-bottom: 30px;
+}
+
+.dropdown-header {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: 600;
+    padding: 15px 0;
+}
+
+.triangle {
+    margin-right: 12px;
+    transition: transform 0.3s ease;
+}
+
+.software-block.active .triangle {
+    transform: rotate(90deg);
+}
+
+.dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.software-block.active .dropdown-content {
+    max-height: 2000px;
+}
+
+.project-item {
+    margin: 25px 0;
+}
+
+.project-item img {
+    max-width: 100%;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+/* ======================
+   STORYMAP
+====================== */
+.storymap-link {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 70vh;
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.storymap-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: 0.3s ease;
+}
+
+.storymap-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(31, 41, 51, 0.45); /* matches your --primary tone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    opacity: 0;
+    transition: 0.3s ease;
+    text-align: center;
+    padding: 20px;
+    letter-spacing: 0.5px;
+}
+
+.storymap-link:hover img {
+    filter: grayscale(40%) brightness(80%);
+}
+
+.storymap-link:hover .storymap-overlay {
+    opacity: 1;
+}
+
+/* ======================
+   CONTACT
+====================== */
+.contact-container {
+  display: flex;
+  align-items: flex-start;  /* align top edges */
+  gap: 60px;                /* space between text and image */
+  flex-wrap: wrap;
+}
+
+/* Text block spacing */
+.contact-info {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;                /* space between lines and icons */
+}
+
+/* Adjust heading size */
+.contact-info h2 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+/* Email/phone links */
+.contact-info a {
+  color: var(--primary);
+  text-decoration: underline;
+  font-size: 16px;
+}
+
+.contact-info a:hover {
+  color: var(--accent);
+}
+
+/* Icon links styling */
+.icon-links {
+  display: flex;
+  gap: 20px;
+}
+
+.icon-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  transition: 0.3s;
+}
+
+.icon-links a:hover .icon-img {
+  transform: scale(1.1);
+}
+
+/* Image styling */
+.contact-image img {
+  width: 100%;
+  max-width: 250px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .contact-container {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 700px) {
+  .contact-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .contact-info {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* ======================
+   BACK TO TOP BUTTON
+====================== */
+
+#backToTop {
+    position: fixed;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    padding: 12px 22px;
+    border-radius: 30px;
+
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+
+    border: none;
+
+    background: rgba(255,255,255,0.9);
+    color: var(--primary);
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    cursor: pointer;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+
+    z-index: 999;
+}
+
+#backToTop:hover {
+    background: var(--accent);
+    color: white;
+}
+
+/* visible state */
+#backToTop.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav>
+    <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#storymap">GIS Journey</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-wrapper section-inner">
+    <h2 class="section-title">About</h2>
+    <div class="glass">
+      <div class="about-container">
+        <div class="about-text">
+          <h1>Glenn Gentil</h1>
+          <p>A student nearly graduated from a GIS graduate certificate program where I am gaining skills in geospatial data analysis and database management, eager to apply my current and cutting-edge knowledge in the field of Geographic Information Systems. This is in addition to my 4 year degree in Natural Resource Management where I studied research at the forefront of sustainability in resource extraction and preservation; a toolset I would love to bring to a dedicated and passionate team. With 6 years of work experience I have extensive written and interpersonal communication skills and thrive in a fast-paced, team environment.</p>
+          <div class="icon-links">
+        <a href="https://www.linkedin.com/in/glenn-gentil-21ba54121/" title="LinkedIn" target="_blank" rel="noopener noreferrer">
+            <!-- Replace src with your LinkedIn icon image -->
+            <img src="images/lin.webp" alt="LinkedIn" class="icon-img" />
+        </a>
+        <a href="GlennGentilResume.pdf" title="Resume" download>
+            <!-- Replace src with your resume icon image -->
+            <img src="images/res.webp" alt="Resume" class="icon-img" />
+        </a>
+        </div>
+        </div>
+        <div class="about-image">
+          <img src="images/GlennG.webp" alt="Glenn Gentil" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-wrapper section-inner">
+    <h2 class="section-title">Completed Project Samples</h2>
+    <div class="glass">
+
+      <h3>A collection of projects I have completed during my time working with GIS. This portfolio is only meant to be a small sample of my work: a skill or software's exclusion does not indicate a lack of experience. If you'd like to inquire about my knowledge in a particular field, I am always available at <a href="mailto:gvgentil@gmail.com">gvgentil@gmail.com</a></h3>
+      <br>
+
+      <!-- ESRI -->
+<div class="software-block">
+  <div class="dropdown-header">
+    <span class="triangle">▶</span> Esri
+  </div>
+  <div class="dropdown-content">
+    <div class="project-row">
+      <a href="projects.html#esri-proj1" class="project-title" target="_blank" rel="noopener noreferrer">Analysis Report for Finding Deer Habitat in Nova Scotia (ArcGIS Pro)</a>
+      <img src="images/5.webp" alt="Project Title" class="project-image" />
+    </div>
+    <div class="project-row">
+      <a href="projects.html#esri-proj2" class="project-title" target="_blank" rel="noopener noreferrer">ECCE App Challenge</a>
+      <img src="images/ECCE_Banner.webp" alt="Project Title 2" class="project-image" />
+    </div>
+    <!-- Add more project-row divs as needed -->
+  </div>
+</div>
+
+
+      <!-- PCI GEOMATICS -->
+<div class="software-block">
+  <div class="dropdown-header">
+    <span class="triangle">▶</span> PCI Geomatics
+  </div>
+  <div class="dropdown-content">
+    <div class="project-row">
+      <a href="projects.html#pci-proj1" class="project-title" target="_blank" rel="noopener noreferrer">Image Classification (Catalyst)</a>
+      <img src="images/pci1.webp" alt="Project Title" class="project-image" />
+    </div>
+    <div class="project-row">
+      <a href="projects.html#pci-proj2" class="project-title" target="_blank" rel="noopener noreferrer">Image Enhancements (Catalyst)</a>
+      <img src="images/pci2.webp" alt="Project Title 2" class="project-image" />
+    </div>
+    <!-- Add more project-row divs as needed -->
+  </div>
+</div>
+      <!-- Bentley -->
+<div class="software-block">
+  <div class="dropdown-header">
+    <span class="triangle">▶</span> Bentley
+  </div>
+  <div class="dropdown-content">
+    <div class="project-row">
+      <a href="projects.html#bentley-proj1" class="project-title" target="_blank" rel="noopener noreferrer">LiDAR Calibration, Classification, and Building Vectorization (Microstation)</a>
+      <img src="images/vectors.webp" alt="Project Title" class="project-image" />
+    </div>
+    <div class="project-row">
+      <a href="projects.html#bentley-proj2" class="project-title" target="_blank" rel="noopener noreferrer">Transforming Drone Imagery into 3D Renders (iTwin Capture)</a>
+      <img src="images/bent2.webp" alt="Project Title 2" class="project-image" />
+    </div>
+    <!-- Add more project-row divs as needed -->
+  </div>
+</div>
+
+      <!-- Code -->
+<div class="software-block">
+  <div class="dropdown-header">
+    <span class="triangle">▶</span> Code
+  </div>
+  <div class="dropdown-content">
+    <div class="project-row">
+      <a href="projects.html#code-proj1" class="project-title" target="_blank" rel="noopener noreferrer">Python</a>
+    </div>
+    <div class="project-row">
+      <a href="projects.html#code-proj2" class="project-title" target="_blank" rel="noopener noreferrer">SQL</a>
+    </div>
+    <!-- Add more project-row divs as needed -->
+  </div>
+</div>
+
+    </div>
+  </div>
+</section>
+
+<!-- STORYMAP -->
+<section id="storymap">
+  <div class="section-wrapper section-inner">
+    <h2 class="section-title">My GIS Journey</h2>
+    <div class="glass storymap-container">
+
+      <h3>A brief history of how GIS became my passion and career.</h3>
+      <br>
+      <a href="https://storymaps.arcgis.com/stories/3a2d5cb019504270851951a2e105aead"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="storymap-link">
+
+        <!-- Replace with your actual image path -->
+        <img src="images/duncan.jpg" alt="StoryMap Preview">
+
+        <div class="storymap-overlay">
+          Click to be taken to my StoryMap
+        </div>
+
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner glass">
+    <div class="contact-container">
+      
+      <!-- Contact Info -->
+      <div class="contact-info">
+        <h2>Glenn Gentil</h2>
+        <p><a href="mailto:gvgentil@gmail.com">gvgentil@gmail.com</a></p>
+        <p><a href="tel:+16044044904">+1 (604) 404-4904</a></p>
+        <div class="icon-links">
+          <a href="https://www.linkedin.com/in/glenn-gentil-21ba54121/" title="LinkedIn" target="_blank" rel="noopener noreferrer">
+            <img src="images/lin.webp" alt="LinkedIn" class="icon-img" />
+          </a>
+          <a href="GlennGentilResume.pdf" title="Resume" download>
+            <img src="images/res.webp" alt="Resume" class="icon-img" />
+          </a>
+        </div>
+      </div>
+
+      <!-- Contact Image -->
+      <div class="contact-image">
+        <img src="images/GlennG.webp" alt="Your Name" />
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<button id="backToTop">Back to Top</button>
+
+<script>
+// ============================
+// SECTION WIPE + SIDEBAR ACTIVE STATE
+// ============================
+const sections = document.querySelectorAll('section');
+const innerSections = document.querySelectorAll('.section-inner');
+const navLinks = document.querySelectorAll('nav a');
+
+// Wipe animation observer
+const wipeObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+    entry.target.classList.add('visible');
+}
+    });
+}, { threshold: 0.4 });
+
+innerSections.forEach(section => wipeObserver.observe(section));
+
+// Active sidebar observer
+const navObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(link => link.classList.remove('active'));
+            const activeLink = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+            if (activeLink) activeLink.classList.add('active');
+        }
+    });
+}, { threshold: 0.6 });
+
+sections.forEach(section => navObserver.observe(section));
+
+// ============================
+// DROPDOWNS
+// ============================
+document.querySelectorAll('.software-block').forEach(block => {
+    const header = block.querySelector('.dropdown-header');
+    header.addEventListener('click', () => {
+        block.classList.toggle('active');
+    });
+});
+
+// ============================
+// SMOOTH SIDEBAR NAVIGATION
+// ============================
+navLinks.forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        target.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    });
+});
+
+// ============================
+// BACK TO TOP BUTTON
+// ============================
+
+const backToTop = document.getElementById("backToTop");
+
+// Show button after scrolling down
+window.addEventListener("scroll", () => {
+    if (window.scrollY > 400) {
+        backToTop.classList.add("show");
+    } else {
+        backToTop.classList.remove("show");
+    }
+});
+
+// Scroll smoothly to top
+backToTop.addEventListener("click", () => {
+    document.querySelector("#about").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+});
+</script>
+
+
+
+
+</body>
+</html>

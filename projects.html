@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project Viewer - GIS Portfolio</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+
+<style>
+
+  .code-description {
+    margin-bottom: 20px;
+}
+
+.code-block {
+    background: #0f172a;
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+
+    max-height: 350px;
+    overflow: auto;
+
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.25);
+}
+
+.code-block code {
+    white-space: pre;
+}
+
+
+:root {
+    --primary: #1f2933;
+    --accent: #2c7a7b;
+    --light: #f4f7f9;
+    --glass: rgba(255,255,255,0.55);
+    --border: rgba(255,255,255,0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: 
+    linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)),
+    url('bg.png') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--primary);
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ======================
+   TOP NAVBAR
+====================== */
+
+nav {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    padding: 16px 28px;
+
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+
+    border-radius: 14px;
+    border: 1px solid var(--border);
+
+    box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+
+    z-index: 1000;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+nav ul li {
+    margin: 0;
+}
+
+nav ul li a {
+    text-decoration: none;
+
+    font-size: 17px;
+    font-weight: 500;
+
+    padding: 6px 10px;
+
+    color: var(--primary);
+    opacity: 0.75;
+
+    transition: all 0.25s ease;
+}
+
+nav ul li a:hover {
+    opacity: 1;
+    color: var(--accent);
+    transform: translateY(-1px);
+}
+
+nav ul li a.active {
+    opacity: 1;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* ======================
+   PROJECTS CONTAINER
+====================== */
+#projects-container {
+    position: absolute;
+
+    left: 5%;
+    right: 5%;
+    top: 110px; /* space for navbar */
+    bottom: 0;
+
+    padding: 60px 40px 40px 40px;
+    overflow-y: scroll;
+
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+
+    border-radius: 20px;
+    border: 1px solid var(--border);
+
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+}
+
+/* ======================
+   COMPANY PROJECTS SECTIONS
+====================== */
+.company-projects {
+    display: none;
+    scroll-snap-type: y mandatory;
+    gap: 60px;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* visible company */
+.company-projects.active {
+    display: flex;
+}
+
+/* ======================
+   INDIVIDUAL PROJECTS
+====================== */
+
+.project {
+    padding: 60px;
+    margin-bottom: 60px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+}
+.project:focus {
+    outline: none;
+}
+.project h2 {
+    margin-bottom: 30px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+/* Layout container */
+.project-content {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+/* Text column */
+.project-text p {
+    margin-bottom: 18px;
+    line-height: 1.7;
+    font-size: 16px;
+}
+
+/* Media column */
+.project-media {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.project-media img {
+    width: 100%;
+    border-radius: 12px;
+}
+
+.project-figure {
+    margin: 0;
+}
+.project-figure img {
+    width: 500px;      /* ← fixed width */
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+.project-figure img:hover {
+    transform: scale(1.02);
+}
+.project-figure figcaption {
+    margin-top: 8px;
+    font-size: 14px;
+    color: rgba(0,0,0,0.6);
+}
+
+.project.highlighted {
+    animation: projectFlash 1.5s ease-out forwards;
+}
+
+.image-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s ease;
+    z-index: 2000;
+}
+
+/* Visible state */
+.image-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Expanded image */
+.image-modal img {
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: zoomIn 0.25s ease;
+}
+.image-modal video {
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.project-figure video {
+    width: 500px;      /* same as your images */
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    background: black;
+}
+.project-figure video:hover {
+    transform: scale(1.02);
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ======================
+   RESPONSIVE
+====================== */
+@media (max-width: 900px) {
+    #projects-container {
+        left: 2%;
+        right: 150px;
+        padding: 40px 25px 25px 25px;
+    }
+
+    nav {
+        width: 110px;
+        padding: 15px 20px;
+    }
+        .project-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+
+    nav ul {
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    nav ul li a {
+        font-size: 14px;
+    }
+
+    #projects-container {
+        left: 10px;
+        right: 10px;
+        top: 120px;
+        padding: 30px 20px;
+    }
+
+}
+
+
+@keyframes projectFlash {
+    0% {
+        background-color: rgba(44, 122, 123, 0.18);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#esri" class="company-link">ESRI</a></li>
+        <li><a href="#pci" class="company-link">PCI Geomatics</a></li>
+        <li><a href="#bentley" class="company-link">Bentley</a></li>
+        <li><a href="#code" class="company-link">Code</a></li>
+        <!-- Add more companies as needed -->
+    </ul>
+</nav>
+
+<!-- PROJECTS DISPLAY CONTAINER -->
+<div id="projects-container">
+
+  <!-- ESRI PROJECTS -->
+  <section id="esri" class="company-projects">
+    <article id="esri-proj1" class="project" tabindex="0">
+      <h2>Analysis Report for Finding Deer Habitat in Nova Scotia (ArcGIS Pro)</h2>
+       <div class="project-content">
+      <div class="project-text">
+          <h3>Introduction </h3>
+          <p>This study looks at a section of Caledonia, located in Nova Scotia, Canada, to analyze the most suitable location to create a protected area for the benefit of local deer species (family Cervidae). </p>
+          <p>Like most animals, deer require very specific habitats in order to thrive. To limit the scope of this project, three primary requirements were considered when designating a protected area: land use (prioritizing fields and forests), proximity to roads, and riparian zones. A combination of these qualities were used to create the final suitability raster used in analysis.</p>
+          <p>The final result was a 24 square kilometre corridor that could potentially host local deer species to both ensure their safety and decrease their presence in urban landscapes. Further analysis would be required before designating this land a protected area.</p>
+          <h3>Methodology</h3>
+          <p>The first step was to collect the neccessary data for analysis: roads, land use, and riparian zones. The study area is located in Nova Scotia, where data for road networks and riparian zones can publicly be found on GeoNOVA's website. Granular land use data, however, has not been publicized for the province of Nova Scotia. For this reason, data was extracted by doing an image classification on publicized satellite data of the area.</p>
+          <p>Once the image classification is complete, a suitability raster can be created. For this, each of the three criteria need to be given a suitable buffer distance and assigned a weight. These specifications were outlined in the project details. The model used create the suitability raster can be seen in figure 1. </p>
+          <p>It starts by creating a 200 metre buffer around each of the road, riparian zone and field datasets to properly consider the real-world impacts of each of these criteria. A mean is created from these zones, weighting each zone appropriately. From there, results are hexagonalized to improve readability, and inadequate zones are removed from the dataset. Figure 2 shows the final result.</p>
+          <p>Many potential habitats were found, but zones 20 and 29 were selected due to their size (shown in dark green). That said, these habitats are still too small to be valuable to the local deer population: a corridor must be made to connect them. This can easily be done by running cost distance analyses from each habitat, then using them to create a corridor, as shown in figure 3.</p>
+          <p>From here, all that's left is to choose a cutoff for the corridor to be created.</p>
+          <h3>Results</h3>
+          <p>Figure 4 shows the final corridor. With a size of 24 square kilometres, it is large enough and fits enough of the aformentioned criteria to be a suitable site to create a protected area for the deer population. Further research would need to be done before finalizing these works and starting to push for the change to be implemented, such as checking local bylaws, comparing against other criteria, and doing a more in-depth land-use classification. </p>
+
+      </div>
+
+      <div class="project-media">
+        <figure class="project-figure">
+            <img src="images/3.webp" alt="ESRI Project 1" width="800" />
+            <figcaption>Figure 1: model to build suitability raster for deer habitats in Caledonia, Nova Scotia</figcaption>
+            <br>
+            <img src="images/2.webp" alt="ESRI Project 1" width="800" />
+            <figcaption>Figure 2: Suitability raster for deer habitats in Caledonia, Nova Scotia. Simplified for readability</figcaption>
+            <br>
+            <img src="images/5.webp" alt="ESRI Project 1" width="800" />
+            <figcaption>Figure 3: Corridor between zones 20 and 29</figcaption>
+            <br>
+            <img src="images/6.webp" alt="ESRI Project 1" width="800" />
+            <figcaption>Figure 4: Suggested deer habitat in Caledonia, Nova Scotia</figcaption>
+        </figure>   
+      </div>
+  </div>
+
+
+    </article>
+
+    <article id="esri-proj2" class="project" tabindex="0">
+      <h2>ECCE App Challenge</h2>
+       <div class="project-content">
+      <div class="project-text">
+          <p><b>*Note: the ECCE App Challenge is an ongoing competition. As such, I am not allowed to discuss details of our submission until after the challenge is finished. This document will only be a general overview until more information can be released publicly.</b></p>
+          <p>The ECCE App Challenge is ran by Esri Canada every year as a means of promoting creativity and innovation within Esri Canada Centres of Excellence. Students are given a topic and must work in teams of three to create an app, using Esri's suite of software, within the course of a week. The app must include a mission statement, documentation, user manual, and an introductory video.</p>
+          <p>This year, I formed a team with two other students from the Centre of Geographic Sciences: Samantha Mair and Adam Nearing. Wanting to bring our best to the competition, we each devoted as much time as we could to the project and were proud of the final results.</p>
+          <p>Each of us brought different skills to the table: excelling in both coding and data analytics, I focused on tasks in these areas, but we all contributed to each aspect of the task. We gained many skills over the course of this week, sharing techniques with each other and doing research when we ran into new problems that needed solving. This allowed us to operate at a high level despite using tools that may have been new to us. But <b>the most important skill I learned</b> during the ECCE App Challenge was how to operate collaboratively in a fast-paced environment. Though I have plenty of experience working in teams, this required us to work synergistically, in a high pressure environment, without corporate oversight. I was proud of the way that we were able to generate and discuss ideas, share knowledge, and create a product that was the culmination of all our talents.</p>
+          <p>If you would like to know more, do contact me at <a href="mailto:gvgentil@gmail.com">gvgentil@gmail.com</a> and I will gladly share more information where possible.</p>
+      </div>
+
+      <div class="project-media">
+        <figure class="project-figure">
+            <img src="images/ECCE_Banner.webp" alt="ESRI Project 1" width="800" />
+            <figcaption>Figure 1: Banner used for our challenge submission</figcaption>
+        </figure>   
+      </div>
+  </div>
+    </article>
+  </section>
+
+  <!-- PCI GEOMATICS PROJECTS -->
+  <section id="pci" class="company-projects">
+    <article id="pci-proj1" class="project" tabindex="0">
+      <h2>Image Enhancements (Catalyst)</h2>
+      <div class="project-content">
+      <div class="project-text">
+          <p>The goal of this project was to create an image enhancement of Landsat 8 data that makes it easier to identify rivers and streams eneath the forest canopy in Parque Nacional do Jaú. This was done throught wo separate methods: one relying on standard enhancement tools within Catalyst's software, the other being done using a custom enhanncement. The poster in figure 1 outlines the process that was undertaken to obtain these results, why said choices were made, and the ways in which the results could be improved.</p>
+      <p>I began by applying standard enhancements such as contrast stretching, band combinations, and histogram adjustments to establish a performance baseline. I then developed custom enhancement workflows, experimenting with band ratios, edge detection, and selective contrast manipulations designed to amplify subtle spectral differences associated with surface moisture and drainage paths. By directly comparing outputs, I evaluated which methods most clearly improved stream visibility while minimizing noise and canopy interference.</p>
+      <p>The final results were presented in an infographic that documented the full analytical process. The poster included a clear methodology section outlining enhancement techniques, a discussion and results section comparing effectiveness between standard and custom approaches, and a reflection on potential improvements. While the custom enhancement workflow showed promise and could be further refined, particularly through additional spectral indices or higher-resolution imagery, it demonstrated measurable improvements over default settings in specific areas of interest.</p>
+      <p>Although the custom approach has room for further optimization, this project significantly strengthened my understanding of working with satellite imagery, spectral behavior in dense vegetation environments, and the importance of iterative testing. It highlights my ability to independently design a geospatial study, critically evaluate analytical methods, and communicate findings through clear, visually structured presentation materials.</p>
+        </div>
+
+      <div class="project-media">
+        <figure class="project-figure">
+            <img src="images/enhanceMap.webp" alt="ESRI Project 1" width="800" />
+            <figcaption>Figure 1: Poster displaying image enhancement</figcaption>
+        </figure>   
+      </div>
+  </div>
+    </article>
+    <article id="pci-proj2" class="project" tabindex="0">
+      <h2>Image Classification (Catalyst)</h2>
+      <div class="project-content">
+      <div class="project-text">
+          <p>For this project, I conducted a supervised image classification using PCI Geomatics’ Catalyst Professional to analyze satellite imagery and produce a thematic land cover map. The objective was to classify land cover types within a defined study area using training data and spectral analysis, then clearly communicate the results through a professionally designed infographic poster. This project combined remote sensing analysis with visual data presentation.</p>
+
+<p>The classification process incorporated training samples collected from a wide range of distinct land cover types to capture spectral variability across the landscape. Multiple subclasses were initially defined to improve classification accuracy and ensure subtle differences in vegetation, soil exposure, and developed surfaces were represented in the model. For the final deliverable, these detailed subclasses were consolidated into six primary categories to improve clarity and visual communication: water, forest, herbaceous, barren, urban, and burn scar. This generalization step maintained analytical integrity while producing a map that was easier to interpret for a broad audience.</p>
+
+<p>After finalizing the classification results, I designed an infographic poster to communicate key findings to a non-technical audience. The poster included:</p>
+<ul>
+<li>A clearly labeled final land cover classification map</li>
+
+<li>A legend with simplified class descriptions and color symbology</li>
+
+<li>A concise methodology overview explaining the supervised process</li>
+<br>
+<p>This project demonstrates my ability to perform remote sensing analysis using industry-standard software, apply supervised classification techniques, thoughtfully generalize results for effective communication, and present geospatial findings in a clear, visually compelling format suitable for academic or professional audiences.</p>
+      </div>
+
+      <div class="project-media">
+        <figure class="project-figure">
+            <img src="images/pci11.webp" alt="ESRI Project 1" width="800" />
+            <figcaption>Figure 1: Poster displaying image classification</figcaption>
+        </figure>   
+      </div>
+  </div>
+    </article>
+  </section>
+
+
+<!-- BENTLEY PROJECTS -->
+  <section id="bentley" class="company-projects">
+    <article id="bentley-proj1" class="project" tabindex="0">
+      <h2>LiDAR Calibration, Classification, and Building Vectorization (Microstation)</h2>
+      <div class="project-content">
+      <div class="project-text">
+          <p>This project involved calibrating and classifying LiDAR using MicroStation, focusing on improving point cloud accuracy and producing a clean, classified dataset suitable for analysis. The workflow began with importing raw LiDAR points and compartmentalizing them into 1 kilometre grid squares to improve data load times.</p>
+
+<p>Calibration was performed to correct for aircraft orientation effects, specifically adjusting for pitch and yaw to improve vertical and horizontal alignment of the point cloud. This step ensured that elevation values and feature positioning were as accurate as possible before classification. Careful review of cross-sections and elevation profiles helped verify that systematic distortions were minimized.</p>
+
+<p>To streamline classification, I developed a macro that automatically categorized points into standard classes: noise, ground, low vegetation, medium vegetation, high vegetation, and buildings. Automating this process increased efficiency and consistency across tiles. After running the macro, I conducted a detailed manual review to correct misclassified areas: particularly along buildings, bridges, and complex terrain where automated routines can produce erroneous results.</p>
+
+<p>With the data prepared, all that was left to do was vectorize buildings. Though the automatic vectorization tool does well, like when classifying, a manual check of all 150+ buildings was required, with some editing necessary. Figure 2 shows the result for some of the more complex structures in Lawrencetown.</p>
+      </div>
+
+      <div class="project-media">
+        <figure class="project-figure">
+            <img src="images/classified.webp" alt="ESRI Project 1" width="800" />
+            <figcaption>Figure 1: Classified LiDAR points in Lawrencetown, Nova Scotia</figcaption>
+        </figure>   
+        <figure class="project-figure">
+            <img src="images/vectors.webp" alt="ESRI Project 1" width="800" />
+            <figcaption>Figure 2: Vectorized buildings in Lawrencetown, Nova Scotia</figcaption>
+        </figure>   
+      </div>
+  </div>
+    </article>
+
+
+    <article id="bentley-proj2" class="project" tabindex="0">
+      <h2>Transforming Drone Imagery into 3D Renders (iTwin Capture)</h2>
+      <div class="project-content">
+      <div class="project-text">
+          <p>Being my first time alligning drone imagery, I followed one of Bentley's iTwin Capture tutorials to learn the process for generating 3D renders from geolocated photographs. The objective was to transform a series of overlapping aerial images into a coherent three-dimensional model that accurately represented terrain and surface features.</p>
+          <p>The process involved importing drone imagery, aligning photographs through automated tie-point generation, and producing a dense point cloud. From there I generated a textured 3D mesh and orthographic outputs suitable for visualization and basic spatial analysis. I monitored alignment quality, adjusted processing settings as needed, and reviewed outputs to ensure spatial consistency and realistic surface representation.</p>
+<p>This project strengthened my understanding of how raw aerial imagery can be converted into usable 3D spatial products. It expanded my familiarity with reality capture software, data processing pipelines, and quality control considerations, while reinforcing the practical applications of drone-based geospatial data collection and visualization.</p>
+
+      </div>
+
+      <div class="project-media">
+        <figure class="project-figure">
+            <video autoplay muted loop playsinline>
+    <source src="images/3d360.mov" type="video/mp4">
+</video>
+            <figcaption>Figure 1: Finalized 3D Render</figcaption>
+        </figure>   
+      </div>
+  </div>
+    </article>
+  </section>
+
+<!-- CODE PROJECTS -->
+  <section id="code" class="company-projects">
+    <article id="code-proj1" class="project" tabindex="0">
+      <h2>Python Project Samples</h2>
+
+<div class="project-media">
+
+<div class="code-description">
+  <p><b>*Note: some of the following code snipppets require files stored locally in order to run and may not work on your system. Code is provided as example material only.</b></p>
+  <br>
+  <br>
+  <h3>Geospatial Population Statistics Tool</h3>
+  <br>
+<p>The Geospatial Population Statistics Tool is an add-on to QGIS that takes data on a selected set of 
+points, categorizes them as being northeastern, southeastern, northwestern, or southwestern, then 
+outputs the following information: </p>
+<br>
+<ul>
+  <li>Number of points allocated to each quadrant</li>
+  <li>Total population of each quadrant </li>
+  <li>The place(s) with the highest population</li>
+  <li>The place(s) with the lowest population </li>
+  </ul>
+  <br>
+  <p>This output is saved as a text file to a user-specified location. </p>
+  <p>A detailed, custom user manual can be found by following <a href="PopStatsManual.pdf">this link.</a></p>
+</div>
+
+<pre class="code-block"><code>
+#
+# Program: World_GlennGentil
+# Programmer: Glenn Gentil
+# Date: October 30, 2025
+# Purpose: Indicate largest and smallest population cities from a dataset
+#
+
+import os
+
+def getNSHemi(y):
+    if y < 0:
+        return "South"
+    else:
+        return "North"
+        
+def getEWHemi(x):
+    if x < 0:
+        return "western"
+    else:
+        return "eastern"
+
+#Get the active layer
+currLayer = iface.activeLayer()
+
+featureCount = currLayer.selectedFeatureCount()
+
+#selects all features if none are selected
+if featureCount == 0:
+    currLayer.selectAll()
+    
+currLyrSelection = currLayer.selectedFeatures()
+
+#Create values to hold data for each point
+names = []
+pops = []
+quadrants = []
+#Create variables to hold population sums for each quadrant
+NEpop = 0
+NWpop = 0
+SEpop = 0
+SWpop = 0
+#Create variables to hold number of places in each quadrant
+NEcount = 0
+NWcount = 0
+SEcount = 0
+SWcount = 0
+
+#Categorize points into quadrants
+for currFeature in currLyrSelection:
+    
+    #Extract coord information
+    geom = currFeature.geometry()
+    xCoord = geom.asPoint().x()
+    yCoord = geom.asPoint().y()
+    
+    #Get quardrant info
+    NS = getNSHemi(yCoord)
+    EW = getEWHemi(xCoord)
+    
+    #Add info to relevant list
+    names.append(currFeature["nameascii"])
+    pops.append(currFeature["pop_max"])
+    quadrants.append(NS + EW)
+    
+    #Update pop sums and quadrant counts
+    if NS == "North":
+        if EW == "eastern":
+            NEcount += 1
+            NEpop += int(currFeature["pop_max"])
+        else:
+            NWcount += 1
+            NWpop += int(currFeature["pop_max"])
+    else:
+        if EW == "eastern":
+            SEcount += 1
+            SEpop += int(currFeature["pop_max"])
+        else:
+            SWcount += 1
+            SWpop += int(currFeature["pop_max"])
+
+#figures out maximum and minimum population values and stores them in a variable
+maxPopNum = max(pops)
+minPopNum = min(pops)
+
+#Checks whether there are multiple cities with same max
+multiMax = False
+multiMaxCheck = 0
+multiMaxCities = []
+
+for i in range(len(pops)):
+    if pops[i] == maxPopNum:
+        multiMaxCities.append(names[i])
+        multiMaxCheck += 1
+        if multiMaxCheck > 1:
+            multiMax = True
+            
+
+#Checks whether there are multiple cities with same min
+multiMin = False
+multiMinCheck = 0
+multiMinCities = []
+
+for i in range(len(pops)):
+    if pops[i] == minPopNum:
+        multiMinCities.append(names[i])
+        multiMinCheck += 1
+        if multiMinCheck > 1:
+            multiMin = True
+            
+#Creates a variable storing the position of max/min population cities in the list
+maxPosition = int(pops.index(maxPopNum))
+minPosition = int(pops.index(minPopNum))
+
+#Create dictionary to store values
+finalDataDict = {
+  "Highest population": maxPopNum,
+  "Lowest population": minPopNum,
+  "North eastern cities count": NEcount,
+  "North western cities count": NWcount,
+  "South eastern cities count": SEcount,
+  "South western cities count": SWcount,
+  "North eastern cities population total": NEpop,
+  "North western cities population total": NWpop,
+  "South eastern cities population total": SEpop,
+  "South western cities population total": SWpop,
+  "Quadrant with highest population": quadrants[maxPosition],
+  "Quadrant with lowest population": quadrants[minPosition],
+  "Cities with highest population": multiMaxCities,
+  "Cities with lowest population": multiMinCities
+}
+
+#get output directory
+qid = QInputDialog()
+default = "C:\\temp\\"
+title = "Population organizer"
+label =  "Write your output directory"
+mode = QLineEdit.Normal
+defaultFileName = "GlennGentilFinalReport"
+
+pathName, ok = QInputDialog.getText(qid, title, label, mode, default)
+
+if len(pathName) == 0:
+    pathName = default
+    
+if not os.path.isdir(default):
+    os.mkdir(default)
+
+pathf, ext = os.path.splitext(pathName)
+if ext == "":
+    ext = ".txt"
+    pathName += defaultFileName
+    pathName += ".txt"
+if ext != ".txt":
+    pathName = pathf + ".txt"
+if ok:
+    finished = False
+    while not finished:
+        #write the final report
+        try:
+            with open(pathName, "x") as f:
+                f.write("Report of Selected World Places\n")
+                f.write("=============================================================\n")
+
+                f.write("{0:<4}{1}{2:>9}\n".format(finalDataDict["North eastern cities count"], " northeastern places have a total population of ", finalDataDict["North eastern cities population total"]))
+                f.write("{0:<4}{1}{2:>9}\n".format(finalDataDict["North western cities count"], " northwestern places have a total population of ", finalDataDict["North western cities population total"]))
+                f.write("{0:<4}{1}{2:>9}\n".format(finalDataDict["South eastern cities count"], " southeastern places have a total population of ", finalDataDict["South eastern cities population total"]))
+                f.write("{0:<4}{1}{2:>9}\n".format(finalDataDict["South western cities count"], " southwestern places have a total population of ", finalDataDict["South western cities population total"]))
+
+                f.write("=============================================================\n")
+                #Different types of output: one for when there are multiple cities with same min/max value, one when there isn't
+                if multiMin == True:
+                    
+                    if multiMax == True:
+                        
+                        f.write("The places of:\n")
+                        for i in range(len(multiMaxCities)):
+                            f.write("              {0}\n" .format(finalDataDict["Cities with highest population"][i]))
+                            
+                        f.write("{0}{1}\n".format("All have the highest population of ", finalDataDict["Highest population"]))
+                        f.write("")
+                        f.write("The places of:\n")
+                        for i in range(len(multiMinCities)):
+                            f.write("              {0}\n" .format(finalDataDict["Cities with lowest population"][i]))
+                            
+                        f.write("{0}{1}\n".format("All have the lowest population of ", finalDataDict["Lowest population"]))
+                        
+                        
+                    else:
+                        f.write("{0}{1}{2}{3}{4}{5}\n".format("The ", finalDataDict["Quadrant with highest population"], " place of ", finalDataDict["Cities with highest population"][0], " has the highest population of ", finalDataDict["Highest population"]))
+                        f.write("")
+                        f.write("The places of:\n")
+                        for i in range(len(multiMinCities)):
+                            f.write("              {0}\n" .format(finalDataDict["Cities with lowest population"][i]))
+                            
+                        f.write("{0}{1}\n".format("All have the lowest population of ", finalDataDict["Lowest population"]))
+                        
+                else:
+                    
+                    if multiMax == True:
+                        
+                        f.write("The places of:\n")
+                        for i in range(len(multiMaxCities)):
+                            f.write("              {0}\n" .format(finalDataDict["Cities with highest population"][i]))
+                        f.write("{0}{1}\n".format("All have the highest population of ", finalDataDict["Highest population"]))
+                        f.write("")
+                        f.write("{0}{1}{2}{3}{4}{5}\n".format("The ", finalDataDict["Quadrant with lowest population"]," place of ", finalDataDict["Cities with lowest population"][0]," has the lowest population of ", finalDataDict["Lowest population"]))
+                        
+                    else:
+                        f.write("{0}{1}{2}{3}{4}{5}\n".format("The ", finalDataDict["Quadrant with highest population"], " place of ", finalDataDict["Cities with highest population"][0], " has the highest population of ", finalDataDict["Highest population"]))
+                        f.write("")
+                        f.write("{0}{1}{2}{3}{4}{5}\n".format("The ", finalDataDict["Quadrant with lowest population"]," place of ", finalDataDict["Cities with lowest population"][0]," has the lowest population of ", finalDataDict["Lowest population"]))
+                finished = True
+        #If the file already exists, add _NEW
+        except:
+            pathf, ext = os.path.splitext(pathName)
+            pathName = pathf + "_NEW.txt"
+
+</code></pre>
+  <br>
+  <h3>North Shore Cougar Habitat Suitability Calculator</h3>
+<p>The North Shore Cougar Habitat Suitability Calculator is an app that takes data on a collection of 4 to 
+10 forest stands, categorizes them as being low, medium, or high suitability areas for being habitats for 
+the north shore cougar, then outputs general information about the amount of area covered by the 
+inputted forest stands.</p>
+<p>A user manual for the tool can be found at the following <a href="HabitatManual.pdf">link.</a></p>
+
+
+<pre class="code-block"><code>
+  '''
+    Program: assignment1GlennG
+    Programmer: Glenn Gentil
+    Date: October 2, 2025
+    Description: Assesses between 4 and 10 stands for
+    their suitability as habitats for the North Shore Cougar
+'''
+
+
+#===========================================================================
+# Function: get_num()
+# Purpose : Validate the entry of a number
+# Arguments: prompt - The prompt to display asking for a number.
+#            err    - The error message to show for invalid numbers.
+# Return Value: num - the valid number.
+#===========================================================================
+def get_num(prompt,err):
+
+# Initialize the boolean value for the loop and start the loop.
+    good = False
+    while not good:
+
+# Attempt to read a number and if successful, change the boolean value
+        try:
+
+# Display the prompt passed to the function.
+            num = input(prompt)
+            num = int(num)
+            good =  True
+
+
+# If the input is not successful, display the error message.
+        except:
+            print(err)
+
+# When the loop ends, return the good number to the calling statement.
+    return num
+
+#===========================================================================
+# Function: get_cover()
+# Purpose : Validate the entry of a cover type
+# Arguments: current_range: which stand # is currently being asked of the user
+# Return Value: cover - the valid cover type.
+#===========================================================================
+
+def get_cover(current_range):
+    
+    cover = str(input("Enter one of the following cover types for stand {0}: \n     Softwood - S \n     Mixedwood - M \n     Hardwood - H \n Enter the code: " .format(current_range+1)))
+                
+#Makes sure the user inputted something
+    while len(cover) == 0:
+        cover = str(input("Invalid input. Please enter one of the following cover types for stand {0}: \n     Softwood - S \n     Mixedwood - M  \n     Hardwood - H \n Enter the code: " .format(current_range+1)))
+                    
+#standardizes user input
+    cover = cover[0].upper()  
+#Checks the user inputted a cover type
+    while cover != "S" and cover != "M" and cover != "H":
+
+        print("")
+        cover = str(input("Invalid input. Please enter one of the following cover types for stand {0}: \n     Softwood - S \n     Mixedwood - M  \n     Hardwood - H \n Enter the code: " .format(current_range+1)))
+
+        while len(cover) == 0:
+            cover = str(input("Invalid input. Please enter one of the following cover types for stand {0}: \n     Softwood - S \n     Mixedwood - M  \n     Hardwood - H \n Enter the code: " .format(current_range+1)))
+
+        cover = cover[0].upper()
+#outputs the user's input
+    return cover
+
+
+
+#===========================================================================
+# Function: species_check()
+# Purpose : Validate the entry of a dominant species type
+# Arguments: userInput: the value entered by the user
+#            spc_list: the list of allowed species
+# return value : spc_check - boolean(whether input is correct or not)
+#===========================================================================
+
+def species_check(userInput, spc_list):
+
+#value for whether the user input has been verified as a species code from the list yet or not   
+    spc_check = False
+
+#Checks the user input against every species in the list
+    for i in range(len(spc_list)):
+        spc_check = userInput == spc_list[i][:2]
+        if spc_check == True:
+            return spc_check
+
+    return spc_check
+#===========================================================================
+# Function: get_species()
+# Purpose : Receive user input for dominant species type
+# return value : species - dominant species type
+#===========================================================================
+ 
+def get_species():
+    
+#printing the 'enter the code' message for the user
+    species_list = ("AP - Austrian Pine", "JP - Jack Pine", " RP - Red Pine", "SP - Scots Pine", "WP - White Pine", "BS - Black Spruce", "NS - Norway Spruce", "RS - Red Spruce", "SS - Sitka Spruce", "WS - White Spruce")
+    spc_code = ("Enter the code: ")
+    spc_size = len(species_list)
+    print("Please enter one of the following dominant tree species code: ")
+    for i in range(spc_size):
+        print("{0:>20}" .format(species_list[i]))
+
+#getting the user's input 
+    species = str(input("{0:>21}" .format(spc_code)))    
+    species = species.upper()
+    species = species[:2]
+    spc_check = species_check(species, species_list)
+    
+#Check user input is correct
+    while spc_check == False:
+        print("Incorrect input. Please enter one of the following dominant tree species code: ")
+        for i in range(spc_size):
+            print("{0:>20}" .format(species_list[i]))
+        species = str(input("{0:>21}" .format(spc_code)))
+        species = species.upper()
+        species = species[:2]
+        spc_check = species_check(species, species_list)
+
+#returns value for species once correct
+    return species
+
+#===========================================================================
+# Function: read_nums()                                               
+# Purpose : Use a loop to read the numbers entered by the user.
+# Arguments: list: which list is being checked
+#            msg: what the user is currently being asked to input
+#===========================================================================
+def read_nums(list, msg):
+    
+# Loop to read the numbers.  
+    for i in range(list_size):
+        list[i] =  get_num("Enter value for the {1} of stand {0:2}:" .format(i+1, msg),"\tInvalid value for the {1} of stand {0:2}" .format(i+1, msg))
+
+
+# Display the values in the array
+    print("The numbers entered are : ", list)
+
+#===========================================================================
+# Function: read_cover()                                               
+# Purpose : Use a loop to read the cover types entered by the user.
+#===========================================================================
+    
+def read_cover():
+
+# Loop to read the numbers.  
+    for i in range(list_size):
+        listCover[i] =  get_cover(i)
+
+# Display the values in the array
+    print("The cover types entered are : ", listCover)
+
+#===========================================================================
+# Function: group_stands()                                               
+# Purpose : Takes each stand and assigns them to being low, medium, or high suitability
+#===========================================================================
+
+def group_stands():
+
+#Creating global variables that tell me how many stands are classified in each suitability rating
+    global listSizeLow
+    global listSizeMid
+    global listSizeHigh
+
+    listSizeLow = 0
+    listSizeMid = 0
+    listSizeHigh = 0
+    stand = 0
+    
+    for i in range(list_size):
+        stand = stand_rating(i)
+        if stand < 5:
+            lowSuitable.append(listArea[i])
+            listSizeLow += 1
+        elif stand <= 8:
+            midSuitable.append(listArea[i])
+            listSizeMid += 1
+        else:
+            highSuitable.append(listArea[i])
+            listSizeHigh += 1
+
+#===========================================================================
+# Function: stand_rating()                                               
+# Purpose : Gives each individual stand a suitability rating
+# Return: the rating of the stand
+#===========================================================================
+
+def stand_rating(i):
+    
+    rating = 0
+
+#Update rating for tree diameter
+    if listDia[i] < 20:
+        rating += 0.75
+    elif listDia[i] <= 30:
+        rating += 1.75
+    else:
+        rating += 2.5
+
+#Update rating for tree height
+    if listHeight[i] < 10:
+        rating += 1.25
+    elif listHeight[i] <= 20:
+        rating += 2.5
+    else:
+        rating += 3.75
+
+#Update rating for cover type
+    if listCover[i] == "S":
+        rating += 1
+    elif listCover[i] == "M":
+        rating += 2
+    else:
+        rating += 3.75
+
+    return rating
+
+#===========================================================================
+# Function: main()
+# Purpose : Ask for the number of values
+#           - Call the functions to:
+#               - get the numbers
+#               - calculate the sum 
+#               - get the min and max values
+#           - Display the information.
+#===========================================================================
+
+
+def main():
+
+# Create global variables to allow all functions to use them.
+    global list_size
+    global listDia
+    global listHeight
+    global listCover
+    global listArea
+
+    global lowSuitable
+    global midSuitable
+    global highSuitable
+    
+# Prompt the user for the number of stands to work with.
+    species = get_species()
+    list_size = get_num("How many forest stands do you want to examine?: ",\
+                        "Enter a number please.")
+
+# Keep the number between 4 and 10.
+    if list_size < 4:
+        print("%d is too small, the number will be 4" % list_size)
+        list_size = 4
+    elif list_size > 10:
+        print("%d is too many, the number will be 10" % list_size)
+        list_size = 10
+
+# Create arrays for the lists, using list_size as the number of values
+    listDia = []
+    listDia.extend(range(list_size))
+    listHeight = []
+    listHeight.extend(range(list_size))
+    listCover = []
+    listCover.extend(range(list_size))
+    listArea = []
+    listArea.extend(range(list_size))
+
+#Create arrays for the suitability ratings
+    lowSuitable = []
+    midSuitable = []
+    highSuitable = []
+
+#Gets user input for tree diameter/height, cover type, and stand area
+    read_nums(listDia, "average tree diameter in centimetres")
+    read_nums(listHeight, "average tree height in metres")
+    read_nums(listArea, "area")
+    read_cover()
+
+#Calls to take each stand and assign them to being low, medium, or high suitability
+    group_stands()
+
+#Gets sum, minimum and maximum area data for all three suitabilities
+    sumLowSuit = get_sum(lowSuitable, listSizeLow)
+    sumMidSuit = get_sum(midSuitable, listSizeMid)
+    sumHighSuit =  get_sum(highSuitable, listSizeHigh)
+    minLowSuit = get_min(lowSuitable, listSizeLow)
+    minMidSuit = get_min(midSuitable, listSizeMid)
+    minHighSuit = get_min(highSuitable, listSizeHigh)
+    maxLowSuit = get_max(lowSuitable, listSizeLow)
+    maxMidSuit = get_max(midSuitable, listSizeMid)
+    maxHighSuit = get_max(highSuitable, listSizeHigh)
+    
+#Checks to make sure no dividing by 0 before setting values for the average area of stands in each suitability level
+    if listSizeLow != 0:
+        averageLowSuit = sumLowSuit/listSizeLow
+    else:
+        averageLowSuit = 0
+        
+    if listSizeMid != 0:
+        averageMidSuit = sumMidSuit/listSizeMid
+    else:
+        averageMidSuit = 0
+        
+    if listSizeHigh != 0:
+        averageHighSuit = sumHighSuit/listSizeHigh
+    else:
+        averageHighSuit = 0
+
+#Prints the final report
+    print("==========================================================================")
+    print("{0:^6}{0:^6}{1}" .format("|", "North Mountain Cougar Habitat Suitability Analysis"))
+    print("{0:^6}{0:^6}{0:^6}{1:2} of {2:2} {3}" .format("|", list_size, species, "Polygons in Study Area"))
+    print("==========================================================================")
+    print("Low suitability: ")
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:6}" .format("|", "Number of polygons:", listSizeLow))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Minimum polygon area:", minLowSuit))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Maximum polygon area:", maxLowSuit))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Total area:", sumLowSuit))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Average polygon area:", averageLowSuit))
+    print("")
+    print("Medium suitability: ")
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:6}" .format("|", "Number of polygons:", listSizeMid))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Minimum polygon area:", minMidSuit))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Maximum polygon area:", maxMidSuit))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Total area:", sumMidSuit))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Average polygon area:", averageMidSuit))
+    print("")
+    print("High suitability: ")
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:6}" .format("|", "Number of polygons:", listSizeHigh))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Minimum polygon area:", minHighSuit))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Maximum polygon area:", maxHighSuit))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Total area:", sumHighSuit))
+    print("{0:^6}{0:^6}{0:^6}{1:>23}{2:10.3f}" .format("|", "Average polygon area:", averageHighSuit))
+    print("==========================================================================")
+          
+#===========================================================================
+# Function: get_sum()                                                  
+# Purpose : Calculate the sum of the numbers in the array.
+# Arguments: listType: the list that is being summed
+#            listSize: the number of numbers in the list
+# Return: the sum of all numbers in the list
+#===========================================================================
+def get_sum(listType, listSize):
+    
+    sum_num = 0
+
+# Use a loop to calculate the sum of the numbers.
+    for i in range(listSize):
+        sum_num = sum_num + listType[i]
+        
+    return sum_num
+
+
+#===========================================================================
+# Function: get_min()                                                  
+# Purpose : Calculate the smallest of the numbers in the array
+# Arguments: listType: the list that is being summed
+#            listSize: the number of numbers in the list
+# Return: the minimum value in the list
+#===========================================================================
+def get_min(listType, listSize):
+
+    min_num = 0
+    
+# Use a loop to calculate the min of numbers
+    for i in range(listSize):
+        if i == 0:
+            min_num = listType[i]
+        if listType[i] < min_num:
+            min_num = listType[i]
+    
+    return min_num
+
+#===========================================================================
+# Function: get_max()                                                  
+# Purpose : Calculate the largest of the numbers in the array
+# Arguments: listType: the list that is being summed
+#            listSize: the number of numbers in the list
+# Return: the maximum value in the list
+#===========================================================================
+def get_max(listType, listSize):
+    
+    max_num = 0
+    
+# Use a loop to calculate the max of numbers
+    for i in range(listSize):
+        if i == 0:
+            max_num = listType[i]
+        if listType[i] > max_num:
+            max_num = listType[i]
+    
+    return max_num
+
+#===========================================================================
+# Mainline:
+#  - Run the function main() until the user answers No.
+#===========================================================================
+again = "Y"
+while again[0].upper() != "N":
+    
+    main()
+
+    again = input("Classify another set of stands? : ")     
+    if len(again) == 0:
+        again = "Y"
+
+print("Process ended.")
+
+
+</code></pre>
+
+
+
+</div>
+    </article>
+
+    <article id="code-proj2" class="project" tabindex="0">
+      <h2>SQL Project Samples</h2>
+      <div class="project-media">
+
+
+
+
+
+        
+<div class="code-description">
+<p><b>*Note: the following code snipppets reference material within a personal database and will not work on your system. Code is provided as example material only.</b></p>
+<br>
+<br>
+<h3>Creating and Querying a Geodatabase for COGS Park</h3>
+<br>
+<p>The COGS Park is made up of several forests that contain stands of varied species of trees. 
+Access roads crisscross the park. There are facilities within the park such as campgrounds and park 
+offices. Rivers running through the park provide water and recreational opportunities for the different 
+facilities. The park is staffed by a manager, park rangers, and facilities employees.</p>
+<p>To keep track of this inventory, I created a geodatabase that stores each of these factors effeciently and to third normal form. It can now easily be searched, have its records updated, and even be queried geographically to analyze the data in 2D space.</p>
+</div>
+
+<pre class="code-block">
+<code>
+/*
+Program: GlennGentilAsgn4SDM.sql
+Programmer: Glenn Gentil
+Date: December 4, 2025
+Purpose: Create, populate and query a database for COGS Park
+*/
+
+
+--
+-- Drop tables if they exist
+--
+DROP TABLE IF EXISTS facility CASCADE;
+DROP TABLE IF EXISTS river CASCADE;
+drop table if exists road CASCADE;
+DROP TABLE IF EXISTS stand CASCADE;
+DROP TABLE IF EXISTS forest CASCADE;
+
+DROP EXTENSION IF EXISTS postgis;
+CREATE EXTENSION postgis;
+
+--
+-- Create facility table
+--
+CREATE TABLE facility(
+id  SERIAL PRIMARY KEY,
+name VARCHAR(20) NOT NULL UNIQUE,
+facilitycode CHAR(2) NOT NULL
+);
+
+--
+-- Create river table
+--
+CREATE TABLE river(
+id  SERIAL PRIMARY KEY,
+name VARCHAR(20) NOT NULL UNIQUE
+);
+
+--
+-- Create road table
+--
+CREATE TABLE road(
+id  SERIAL PRIMARY KEY,
+name VARCHAR(20) NOT NULL UNIQUE,
+composition CHAR(6) NOT NULL
+);
+
+--
+-- Create stand table
+--
+CREATE TABLE stand(
+id  SERIAL PRIMARY KEY,
+species VARCHAR(20) NOT NULL UNIQUE
+);
+
+--
+-- Create forest table
+--
+CREATE TABLE forest(
+id  SERIAL PRIMARY KEY,
+name VARCHAR(20) NOT NULL UNIQUE
+);
+
+--insert records into facility table
+INSERT INTO facility(name,facilitycode) VALUES
+('Outlander','CG'),
+('Treeview','CG'),
+('River Rider','CG'),
+('NorthEast Office','OF'),
+('Park Ranger','OF');
+
+--insert records into river table
+INSERT INTO river(name) VALUES
+('Old Man River'),
+('Annapolis River');
+
+--insert records into road table
+INSERT INTO road(name,composition) VALUES
+('ABC Road','Paved'),
+('Backwoods Road','Paved'),
+('NorthSouth Road','Paved'),
+('Old Clements Road','Gravel'),
+('Bourbon Street','Gravel'),
+('UpDown Road','Gravel');
+
+--insert records into stand table
+INSERT INTO stand(species) VALUES
+('Ash'),
+('Beech'),
+('Cat Spruce'),
+('Elm'),
+('Mixed'),
+('Oak'),
+('Pine'),
+('Spruce');
+
+--insert records into river table
+INSERT INTO forest(name) VALUES
+('Keji'),
+('Spooky Old Forest');
+
+-- add shape column to facility
+ALTER TABLE facility
+ADD COLUMN shape geometry('POINT', 0, 2);
+
+-- add shape column to river
+ALTER TABLE river
+ADD COLUMN shape geometry('LINESTRING', 0, 2);
+
+-- add shape column to road
+ALTER TABLE road
+ADD COLUMN shape geometry('LINESTRING', 0, 2);
+
+-- add shape column to stand
+ALTER TABLE stand
+ADD COLUMN shape geometry('POLYGON', 0, 2);
+
+-- add shape column to forest
+ALTER TABLE forest
+ADD COLUMN shape geometry('POLYGON', 0, 2);
+
+
+
+
+--populate facility table
+UPDATE facility
+Set shape = ST_GeomFromText('POINT(5 32)'
+,0)
+WHERE name LIKE 'Outlander';
+
+UPDATE facility
+Set shape = ST_GeomFromText('POINT(10 16)'
+,0)
+WHERE name LIKE 'Treeview';
+
+UPDATE facility
+Set shape = ST_GeomFromText('POINT(19 18)'
+,0)
+WHERE name LIKE 'River Rider';
+
+UPDATE facility
+Set shape = ST_GeomFromText('POINT(22 28)'
+,0)
+WHERE name LIKE 'NorthEast Office';
+
+UPDATE facility
+Set shape = ST_GeomFromText('POINT(16 6)'
+,0)
+WHERE name LIKE 'Park Ranger';
+
+
+--populate river table
+UPDATE river
+Set shape = ST_GeomFromText('LINESTRING(
+4 35
+,11 16
+,11 3
+)',0)
+WHERE name LIKE 'Old Man River';
+
+UPDATE river
+Set shape = ST_GeomFromText('LINESTRING(
+19 36
+,22 28
+,19 17
+,16 12
+,17 5
+)',0)
+WHERE name LIKE 'Annapolis River';
+
+--Populate road table
+UPDATE road
+Set shape = ST_GeomFromText('LINESTRING(
+4 30
+,6 20
+,20 16
+,23 5
+)',0)
+WHERE name LIKE 'ABC Road';
+
+UPDATE road
+Set shape = ST_GeomFromText('LINESTRING(
+5 32
+,14 26
+,14 15
+,15 11
+,16 4
+)',0)
+WHERE name LIKE 'Backwoods Road';
+
+UPDATE road
+Set shape = ST_GeomFromText('LINESTRING(
+24 33
+,24 16
+,18 9
+,18 5
+)',0)
+WHERE name LIKE 'NorthSouth Road';
+
+UPDATE road
+Set shape = ST_GeomFromText('LINESTRING(
+24 33
+,24 16
+,18 9
+,18 5
+)',0)
+WHERE name LIKE 'NorthSouth Road';
+
+UPDATE road
+Set shape = ST_GeomFromText('LINESTRING(
+5 35
+,5 21
+,9 10
+,9 3
+)',0)
+WHERE name LIKE 'Bourbon Street';
+
+UPDATE road
+Set shape = ST_GeomFromText('LINESTRING(
+19 36
+,19 22
+,11 22
+,3 10
+)',0)
+WHERE name LIKE 'Old Clements Road';
+
+UPDATE road
+Set shape = ST_GeomFromText('LINESTRING(
+23 34
+,23 26
+,22 15
+,26 5
+)',0)
+WHERE name LIKE 'UpDown Road';
+
+--Populate Stand table
+UPDATE stand
+Set shape = ST_GeomFromText('POLYGON((
+4 30
+,14 35
+,14 20
+,9 20
+,4 30
+))',0)
+WHERE species LIKE 'Ash';
+
+UPDATE stand
+Set shape = ST_GeomFromText('POLYGON((
+14 21
+,14 15
+,26 20
+,26 26
+,20 23
+,17 24
+,14 21
+))',0)
+WHERE species LIKE 'Beech';
+
+UPDATE stand
+Set shape = ST_GeomFromText('POLYGON((
+14 21
+,14 15
+,26 20
+,26 26
+,20 23
+,17 24
+,14 21
+))',0)
+WHERE species LIKE 'Cat Spruce';
+
+UPDATE stand
+Set shape = ST_GeomFromText('POLYGON((
+9 20
+,14 20
+,14 15
+,15 11
+,13 5
+,2 10
+,10 18
+,9 20
+))',0)
+WHERE species LIKE 'Elm';
+
+UPDATE stand
+Set shape = ST_GeomFromText('POLYGON((
+15 5
+,26 5
+,26 12
+,15 5
+))',0)
+WHERE species LIKE 'Mixed';
+
+UPDATE stand
+Set shape = ST_GeomFromText('POLYGON((
+14 15
+,26 20
+,26 12
+,15 5
+,13 5
+,15 11
+,14 15
+))',0)
+WHERE species LIKE 'Oak';
+
+UPDATE stand
+Set shape = ST_GeomFromText('POLYGON((
+4 30
+,10 18
+,2 10
+,4 30
+))',0)
+WHERE species LIKE 'Pine';
+
+UPDATE stand
+Set shape = ST_GeomFromText('POLYGON((
+14 35
+,19 36
+,25 33
+,26 32
+,26 26
+,20 23
+,14 26
+,14 35
+))',0)
+WHERE species LIKE 'Spruce';
+
+
+--Update forest table
+UPDATE forest
+Set shape = ST_GeomFromText('POLYGON((
+2 10
+,4 8
+,7 6
+,11 5
+,13 5
+,11 4
+,6 4
+,3 7
+,2 10
+))',0)
+WHERE name LIKE 'Spooky Old Forest';
+
+UPDATE forest
+Set shape = ST_GeomFromText('POLYGON(
+(
+2 37
+,19 37
+,27 32
+,27 2
+,6 2
+,1 8
+,2 37
+),
+(
+2 10
+,4 8
+,7 6
+,11 5
+,13 5
+,11 4
+,6 4
+,3 7
+,2 10
+))',0)
+WHERE name LIKE 'Keji';
+</code></pre>
+<p>A seperate script was also created to query the database on several qualities, such as seeing which forest stand is the largest, checking which roads pass closely to a river, or seeing the distance between individual utilities.</p>
+<pre class="code-block">
+<code>
+-- 1. What is the area of the largest stand?
+SELECT species AS "Stand",
+(ST_Area(shape))::numeric(10,2) AS "Area"
+FROM stand
+WHERE (ST_Area(shape)) IN (
+	SELECT max(ST_Area(shape))
+	FROM stand);
+
+--2. What is the area of the Beech stand?
+SELECT species AS "Stand",
+(ST_Area(shape))::numeric(10,2) AS "Area"
+FROM stand
+WHERE species LIKE 'Beech';
+
+--3. List the total length of roads, by composition
+
+SELECT composition, sum(ST_Length(shape))::numeric(4,2) AS "Combined length of roads"
+FROM road
+GROUP BY composition;
+
+
+--4. How long is the shortest road?
+SELECT name AS "Road",
+(ST_Length(shape))::numeric(10,2) AS "Length"
+FROM road
+WHERE (ST_Length(shape)) in(
+SELECT min(ST_Length(shape))
+FROM road);
+
+--5. List the names of facilities within the Spruce stand
+
+SELECT fa.name "Facilities within Spruce Stand"
+FROM facility fa, stand sa
+WHERE ST_Within(fa.shape, sa.shape)
+AND sa.species LIKE 'Spruce';
+
+--6. List the stands that Old Man River crosses
+
+SELECT sa.species "Stands that Old Man River crosses"
+FROM river ri, stand sa
+WHERE ST_Intersects(ri.shape, sa.shape)
+AND ri.name LIKE 'Old Man River';
+
+--7. List the names of roads that cross rivers, and the rivers they cross.
+
+SELECT rd.name "Roads that cross rivers", ri.name "River crossed"
+FROM river ri, road rd
+WHERE ST_Intersects(ri.shape, rd.shape);
+
+--8. What is the distance between the treeview and the river rider facilities
+SELECT (ST_Distance(ci.shape, cy.shape))::numeric(6,2) AS "Distance between Treeview and River Rider"
+FROM facility ci, facility cy
+WHERE ci.name like 'Treeview'
+AND cy.name like 'River Rider';
+
+--9. What is the distance between the NorthEast office and the annapolis 
+SELECT (ST_Distance(ci.shape, cy.shape))::numeric(6,2) AS "Distance between Treeview and River Rider"
+FROM facility ci, river cy
+WHERE ci.name like 'Treeview'
+AND cy.name like 'Annapolis River';
+
+--10. Which facilities are within one map unit of a road, and which road(s) are they close to
+SELECT ci.name AS "Facility",
+ri.name AS "Road"
+FROM facility ci, road ri
+WHERE ST_DWithin(ci.shape, ri.shape, 1);
+</code></pre>
+
+
+
+
+
+
+
+
+<div class="code-description">
+<br>
+<h3>PL/SQL Function To Convert Between Any Units of Measure</h3>
+<br>
+<p>This function accepts a value and can convert it to almost any unit of measure, whether it be radians to degrees or yards to nautical miles. The code draws from the units-of-measure table in order to provide accurate results. It also generates custom error messages if you attempt to convert between incompatible unit types, such as radians to metres. Functions such as this can streamline workflows in industry by simplifying calculations that may otherwise take up valuable time.</p>
+</div>
+
+<pre class="code-block">
+<code>
+CREATE OR REPLACE FUNCTION COGS_CONVERT_UNIT (VALUE NUMBER, STARTING_UNIT SDO_UNITS_OF_MEASURE.UNIT_OF_MEAS_NAME%TYPE, CONVERT_TO_UNIT SDO_UNITS_OF_MEASURE.UNIT_OF_MEAS_NAME%TYPE) RETURN NUMBER IS
+    START_FACT_B SDO_UNITS_OF_MEASURE.UNIT_OF_MEAS_NAME%TYPE;
+    START_FACT_C SDO_UNITS_OF_MEASURE.UNIT_OF_MEAS_NAME%TYPE;
+
+    END_FACT_B SDO_UNITS_OF_MEASURE.UNIT_OF_MEAS_NAME%TYPE;
+    END_FACT_C SDO_UNITS_OF_MEASURE.UNIT_OF_MEAS_NAME%TYPE;
+
+    START_TYPE SDO_UNITS_OF_MEASURE.UNIT_OF_MEAS_TYPE%TYPE;
+    END_TYPE SDO_UNITS_OF_MEASURE.UNIT_OF_MEAS_TYPE%TYPE;
+
+    METRES NUMBER;
+BEGIN
+
+    IF STARTING_UNIT = CONVERT_TO_UNIT THEN
+        RETURN VALUE;
+    END IF;
+
+    select FACTOR_B, FACTOR_C, UNIT_OF_MEAS_TYPE
+    into START_FACT_B, START_FACT_C, START_TYPE
+    from SDO_UNITS_OF_MEASURE
+    where UPPER(UNIT_OF_MEAS_NAME) = UPPER(STARTING_UNIT);
+
+    select FACTOR_B, FACTOR_C, UNIT_OF_MEAS_TYPE
+    into END_FACT_B, END_FACT_C, END_TYPE
+    from SDO_UNITS_OF_MEASURE
+    where UPPER(UNIT_OF_MEAS_NAME) = UPPER(CONVERT_TO_UNIT);
+
+
+    IF START_TYPE != END_TYPE THEN 
+        RAISE_APPLICATION_ERROR(-20808, 'ERROR: Units ' || STARTING_UNIT || ' and ' || CONVERT_TO_UNIT || ' are not of same type.');
+    END IF;
+
+    METRES := VALUE * START_FACT_B / START_FACT_C;
+    RETURN (METRES * END_FACT_C / END_FACT_B);
+END;
+</code></pre>
+
+</div>
+  </div>
+    </article>
+
+  </section>
+
+
+
+</div>
+<div id="image-modal" class="image-modal">
+
+  <img id="modal-img" src="" alt="">
+
+  <video id="modal-video" controls>
+    <source id="modal-video-src" src="">
+  </video>
+
+</div>
+<script>
+// Helper function: get URL hash without the '#' symbol
+function getHash() {
+  return window.location.hash ? window.location.hash.substring(1) : '';
+}
+
+// Initialize - show correct company projects and scroll to project
+function initializeProjects() {
+  const hash = window.location.hash ? window.location.hash.substring(1) : '';
+
+  const companies = document.querySelectorAll('.company-projects');
+  const sidebarLinks = document.querySelectorAll('.company-link');
+
+  let companyToShow = companies[0]; // default company
+  let projectToShow = null;
+
+  if (hash) {
+    const dashIndex = hash.indexOf('-');
+    let companyPart = hash;
+    let projectPart = null;
+
+    if (dashIndex !== -1) {
+      companyPart = hash.substring(0, dashIndex); // e.g., "esri"
+      projectPart = hash.substring(dashIndex + 1); // e.g., "proj2"
+    }
+
+    // Activate company section first
+    const companySection = document.getElementById(companyPart);
+    if (companySection) companyToShow = companySection;
+
+    companies.forEach(c => c.classList.toggle('active', c === companyToShow));
+
+    // Highlight sidebar link
+    sidebarLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === `#${companyToShow.id}`);
+    });
+
+    // Scroll to project after a short delay to ensure section is visible
+    if (projectPart) {
+      projectToShow = document.getElementById(`${companyPart}-${projectPart}`);
+      if (projectToShow) {
+        // Small delay allows layout/render to finish
+        setTimeout(() => {
+  projectToShow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Add highlight class
+  projectToShow.classList.add('highlighted');
+
+  // Remove it after animation finishes
+  setTimeout(() => {
+    projectToShow.classList.remove('highlighted');
+  }, 2500);
+
+}, 50);
+      }
+    }
+  } else {
+    // No hash: show first company
+    companies.forEach(c => c.classList.toggle('active', c === companyToShow));
+    sidebarLinks.forEach(l => l.classList.toggle('active', false));
+  }
+
+  // Scroll container top if no project specified
+  if (!projectToShow) {
+    const container = document.getElementById('projects-container');
+    container.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+
+
+// Sidebar company link click: switch visible company projects, update URL hash
+document.querySelectorAll('.company-link').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const companyId = link.getAttribute('href').substring(1);
+
+    // Show only selected company projects
+    document.querySelectorAll('.company-projects').forEach(section => {
+      section.classList.toggle('active', section.id === companyId);
+    });
+
+    // Update sidebar highlight
+    document.querySelectorAll('.company-link').forEach(l => {
+      l.classList.toggle('active', l === link);
+    });
+
+    // Reset scroll container to top of the new company projects
+    const container = document.getElementById('projects-container');
+    container.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Update URL hash without page jump
+    history.replaceState(null, '', `#${companyId}`);
+  });
+});
+const modal = document.getElementById('image-modal');
+const modalImg = document.getElementById('modal-img');
+const modalVideo = document.getElementById('modal-video');
+const modalVideoSrc = document.getElementById('modal-video-src');
+
+// Open modal on image click
+document.querySelectorAll('.project-figure img').forEach(img => {
+  img.addEventListener('click', () => {
+
+    modalImg.style.display = "block";
+    modalVideo.style.display = "none";
+
+    modalImg.src = img.src;
+    modal.classList.add('active');
+  });
+});
+document.querySelectorAll('.project-figure video').forEach(video => {
+  video.addEventListener('click', () => {
+
+    modalImg.style.display = "none";
+    modalVideo.style.display = "block";
+
+    modalVideoSrc.src = video.querySelector("source").src;
+    modalVideo.load();
+
+    modal.classList.add('active');
+  });
+});
+
+// Close modal when clicking background
+modal.addEventListener('click', () => {
+
+  modal.classList.remove('active');
+
+  modalImg.src = "";
+
+  modalVideo.pause();
+  modalVideoSrc.src = "";
+
+});
+// On page load initialize
+window.addEventListener('DOMContentLoaded', initializeProjects);
+</script>
+
+
+
+</body>
+</html>
