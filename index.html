@@ -24,14 +24,8 @@
 }
 
 body {
-    background: 
-    linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)),
-    url('images/bg.webp') no-repeat center center fixed;
-    background-size: cover;
-    color: var(--primary);
-    overflow-y: scroll;
+    background: var(--light);
 }
-
 
 /* ======================
    RIGHT SIDEBAR (Improved)
@@ -392,6 +386,18 @@ section {
   object-fit: cover;
 }
 
+.bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+
+    background:
+    linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)),
+    url("images/bg.webp") center / cover no-repeat;
+
+    pointer-events: none;
+}
+
 /* Responsive adjustments */
 @media (max-width: 900px) {
   .contact-container {
@@ -408,6 +414,17 @@ section {
   .contact-info {
     align-items: center;
     text-align: center;
+  }
+}
+
+@media (max-width: 700px) {
+  section {
+    min-height: auto;
+  }
+}
+@media (max-width: 800px) {
+  nav {
+    display: none;
   }
 }
 
@@ -458,7 +475,7 @@ section {
 </style>
 </head>
 <body>
-
+<div class="bg-layer"></div>
 <!-- SIDEBAR -->
 <nav>
     <ul>
@@ -515,11 +532,11 @@ section {
   <div class="dropdown-content">
     <div class="project-row">
       <a href="projects.html#esri-proj1" class="project-title" target="_blank" rel="noopener noreferrer">Analysis Report for Finding Deer Habitat in Nova Scotia (ArcGIS Pro)</a>
-      <img src="images/5.webp" alt="Project Title" class="project-image" />
+      <img src="images/5.webp" alt="Project Title" class="project-image" loading="lazy"/>
     </div>
     <div class="project-row">
       <a href="projects.html#esri-proj2" class="project-title" target="_blank" rel="noopener noreferrer">ECCE App Challenge</a>
-      <img src="images/ECCE_Banner.webp" alt="Project Title 2" class="project-image" />
+      <img src="images/ECCE_Banner.webp" alt="Project Title 2" class="project-image" loading="lazy"/>
     </div>
     <!-- Add more project-row divs as needed -->
   </div>
@@ -534,11 +551,11 @@ section {
   <div class="dropdown-content">
     <div class="project-row">
       <a href="projects.html#pci-proj1" class="project-title" target="_blank" rel="noopener noreferrer">Image Classification (Catalyst)</a>
-      <img src="images/pci1.webp" alt="Project Title" class="project-image" />
+      <img src="images/pci1.webp" alt="Project Title" class="project-image" loading="lazy"/>
     </div>
     <div class="project-row">
       <a href="projects.html#pci-proj2" class="project-title" target="_blank" rel="noopener noreferrer">Image Enhancements (Catalyst)</a>
-      <img src="images/pci2.webp" alt="Project Title 2" class="project-image" />
+      <img src="images/pci2.webp" alt="Project Title 2" class="project-image" loading="lazy"/>
     </div>
     <!-- Add more project-row divs as needed -->
   </div>
@@ -551,11 +568,11 @@ section {
   <div class="dropdown-content">
     <div class="project-row">
       <a href="projects.html#bentley-proj1" class="project-title" target="_blank" rel="noopener noreferrer">LiDAR Calibration, Classification, and Building Vectorization (Microstation)</a>
-      <img src="images/vectors.webp" alt="Project Title" class="project-image" />
+      <img src="images/vectors.webp" alt="Project Title" class="project-image" loading="lazy"/>
     </div>
     <div class="project-row">
       <a href="projects.html#bentley-proj2" class="project-title" target="_blank" rel="noopener noreferrer">Transforming Drone Imagery into 3D Renders (iTwin Capture)</a>
-      <img src="images/bent2.webp" alt="Project Title 2" class="project-image" />
+      <img src="images/bent2.webp" alt="Project Title 2" class="project-image" loading="lazy"/>
     </div>
     <!-- Add more project-row divs as needed -->
   </div>
